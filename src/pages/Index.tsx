@@ -8,6 +8,7 @@ import HowItWorksSection from '../components/HowItWorksSection';
 import CTASection from '../components/CTASection';
 import Footer from '../components/Footer';
 import { setupScrollAnimations } from '../utils/animationObserver';
+import { Toaster } from '@/components/ui/sonner';
 
 const Index = () => {
   useEffect(() => {
@@ -21,7 +22,7 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50/50 to-background">
       <Navbar />
       <main>
         <HeroSection />
@@ -31,6 +32,7 @@ const Index = () => {
         <CTASection />
       </main>
       <Footer />
+      <Toaster />
     </div>
   );
 };
