@@ -1,7 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, LogIn, UserPlus } from 'lucide-react';
 import { Button } from './ui/button';
+import { Link } from 'react-router-dom';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -29,11 +30,11 @@ const Navbar = () => {
       }`}
     >
       <div className="container-custom flex justify-between items-center">
-        <a href="#" className="flex items-center">
+        <Link to="/" className="flex items-center">
           <span className="font-display font-bold text-xl md:text-2xl bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">
             DressFit
           </span>
-        </a>
+        </Link>
 
         <nav className="hidden md:flex items-center space-x-8">
           <a href="#features" className="text-sm font-medium hover:text-primary transition-colors">
@@ -45,7 +46,18 @@ const Navbar = () => {
           <a href="#how-it-works" className="text-sm font-medium hover:text-primary transition-colors">
             How It Works
           </a>
-          <Button className="btn-primary">Get Started</Button>
+          <Link to="/login" className="text-sm font-medium hover:text-primary transition-colors">
+            <Button variant="ghost" className="flex items-center gap-1">
+              <LogIn className="h-4 w-4" />
+              <span>Login</span>
+            </Button>
+          </Link>
+          <Link to="/signup">
+            <Button className="btn-primary flex items-center gap-1">
+              <UserPlus className="h-4 w-4" />
+              <span>Sign Up</span>
+            </Button>
+          </Link>
         </nav>
 
         <button
@@ -82,7 +94,23 @@ const Navbar = () => {
             >
               How It Works
             </a>
-            <Button className="btn-primary w-full mt-2">Get Started</Button>
+            <Link 
+              to="/login"
+              onClick={() => setIsMenuOpen(false)}
+              className="text-sm font-medium hover:text-primary transition-colors py-2 flex items-center gap-2"
+            >
+              <LogIn className="h-4 w-4" />
+              <span>Login</span>
+            </Link>
+            <Link 
+              to="/signup"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <Button className="btn-primary w-full mt-2 flex items-center justify-center gap-2">
+                <UserPlus className="h-4 w-4" />
+                <span>Sign Up</span>
+              </Button>
+            </Link>
           </nav>
         </div>
       )}
