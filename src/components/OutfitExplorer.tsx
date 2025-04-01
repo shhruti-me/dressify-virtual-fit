@@ -157,7 +157,7 @@ const OutfitExplorer = () => {
                   <SelectValue placeholder="All categories" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All categories</SelectItem>
+                  <SelectItem value="all-categories">All categories</SelectItem>
                   {categories.map(category => (
                     <SelectItem key={category} value={category}>{category}</SelectItem>
                   ))}
@@ -174,7 +174,7 @@ const OutfitExplorer = () => {
                   <SelectValue placeholder="All styles" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All styles</SelectItem>
+                  <SelectItem value="all-styles">All styles</SelectItem>
                   {styles.map(style => (
                     <SelectItem key={style} value={style}>{style}</SelectItem>
                   ))}
@@ -191,7 +191,7 @@ const OutfitExplorer = () => {
                   <SelectValue placeholder="All colors" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All colors</SelectItem>
+                  <SelectItem value="all-colors">All colors</SelectItem>
                   {colors.map(color => (
                     <SelectItem key={color} value={color}>{color}</SelectItem>
                   ))}

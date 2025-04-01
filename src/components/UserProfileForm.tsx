@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -31,6 +31,18 @@ const UserProfileForm = () => {
     hips: '',
     gender: '',
   });
+
+  // Load measurements from localStorage on component mount
+  useEffect(() => {
+    const savedMeasurements = localStorage.getItem('userMeasurements');
+    if (savedMeasurements) {
+      try {
+        setMeasurements(JSON.parse(savedMeasurements));
+      } catch (e) {
+        console.error("Error parsing saved measurements", e);
+      }
+    }
+  }, []);
 
   const handleChange = (key: keyof UserMeasurements, value: string) => {
     setMeasurements(prev => ({
