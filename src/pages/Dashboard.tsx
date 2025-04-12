@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import UserProfileForm from '@/components/UserProfileForm';
@@ -7,18 +7,27 @@ import OutfitExplorer from '@/components/OutfitExplorer';
 import { User, Shirt, LogOut, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('profile');
   const navigate = useNavigate();
+  const { user, signOut } = useAuth();
 
-  const handleLogout = () => {
-    toast({
-      title: "Logged out",
-      description: "You have been successfully logged out.",
-    });
-    navigate('/');
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!user) {
+      navigate('/login');
+    }
+  }, [user, navigate]);
+
+  const handleLogout = async () => {
+    await signOut();
   };
+
+  if (!user) {
+    return null; // Will redirect via useEffect
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -59,7 +68,7 @@ const Dashboard = () => {
                 <h2 className="text-2xl font-bold">Welcome to Your Virtual Fitting Room</h2>
                 <p className="text-muted-foreground">
                   Enter your measurements to get the most accurate virtual try-on experience.
-                  All your data is stored securely on your device.
+                  All your data is stored securely in your account.
                 </p>
                 <div className="bg-primary/10 p-4 rounded-lg">
                   <h3 className="font-medium text-primary">How to take measurements</h3>

@@ -8,27 +8,55 @@ import { toast } from '@/hooks/use-toast';
 import { User, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import UserProfileForm from '@/components/UserProfileForm';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 const UserProfile = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [userInfo, setUserInfo] = useState({
     name: '',
     email: '',
     phoneNumber: '',
     address: '',
   });
+  const [loading, setLoading] = useState(false);
 
-  // Load user info from localStorage on component mount
   useEffect(() => {
-    const savedUserInfo = localStorage.getItem('userInfo');
-    if (savedUserInfo) {
+    const fetchUserProfile = async () => {
+      if (!user) return;
+      
       try {
-        setUserInfo(JSON.parse(savedUserInfo));
-      } catch (e) {
-        console.error("Error parsing saved user info", e);
+        setLoading(true);
+        const { data, error } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+
+        if (error && error.code !== 'PGRST116') {
+          // PGRST116 means no rows returned, which is fine for new users
+          console.error('Error fetching user profile:', error);
+          return;
+        }
+
+        if (data) {
+          setUserInfo({
+            name: data.name || '',
+            email: data.email || '',
+            phoneNumber: data.phone_number || '',
+            address: data.address || '',
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+      } finally {
+        setLoading(false);
       }
-    }
-  }, []);
+    };
+
+    fetchUserProfile();
+  }, [user]);
 
   const handleChange = (key: string, value: string) => {
     setUserInfo(prev => ({
@@ -37,14 +65,70 @@ const UserProfile = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Save user info to local storage for persistence
-    localStorage.setItem('userInfo', JSON.stringify(userInfo));
-    toast({
-      title: "Profile updated",
-      description: "Your information has been saved successfully.",
-    });
+    
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to save your information.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    try {
+      setLoading(true);
+      
+      // Check if the user already has a profile
+      const { data: existingData } = await supabase
+        .from('user_profiles')
+        .select('id')
+        .eq('id', user.id)
+        .single();
+      
+      let result;
+      
+      if (existingData) {
+        // Update existing profile
+        result = await supabase
+          .from('user_profiles')
+          .update({
+            name: userInfo.name,
+            email: userInfo.email,
+            phone_number: userInfo.phoneNumber,
+            address: userInfo.address,
+          })
+          .eq('id', user.id);
+      } else {
+        // Insert new profile
+        result = await supabase
+          .from('user_profiles')
+          .insert({
+            id: user.id,
+            name: userInfo.name,
+            email: userInfo.email,
+            phone_number: userInfo.phoneNumber,
+            address: userInfo.address,
+          });
+      }
+      
+      if (result.error) throw result.error;
+      
+      toast({
+        title: "Profile updated",
+        description: "Your information has been saved successfully.",
+      });
+    } catch (error: any) {
+      console.error('Error saving user profile:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to save information",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -118,7 +202,9 @@ const UserProfile = () => {
                     placeholder="Enter your address"
                   />
                 </div>
-                <Button type="submit" className="w-full">Save Information</Button>
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? "Saving..." : "Save Information"}
+                </Button>
               </form>
             </CardContent>
           </Card>

@@ -12,47 +12,83 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 type UserMeasurements = {
   height: string;
   weight: string;
-  bodyType: string;
+  body_type: string;
   shoulder: string;
   chest: string;
   waist: string;
   hips: string;
   thighs: string;
-  inseamLength: string;
-  skinTone: string;
+  inseam_length: string;
+  skin_tone: string;
   gender: string;
 };
 
 const UserProfileForm = () => {
+  const { user } = useAuth();
   const [measurements, setMeasurements] = useState<UserMeasurements>({
     height: '',
     weight: '',
-    bodyType: '',
+    body_type: '',
     shoulder: '',
     chest: '',
     waist: '',
     hips: '',
     thighs: '',
-    inseamLength: '',
-    skinTone: '',
+    inseam_length: '',
+    skin_tone: '',
     gender: '',
   });
+  const [loading, setLoading] = useState(false);
 
-  // Load measurements from localStorage on component mount
+  // Load measurements from Supabase on component mount
   useEffect(() => {
-    const savedMeasurements = localStorage.getItem('userMeasurements');
-    if (savedMeasurements) {
+    const fetchMeasurements = async () => {
+      if (!user) return;
+      
       try {
-        setMeasurements(JSON.parse(savedMeasurements));
-      } catch (e) {
-        console.error("Error parsing saved measurements", e);
+        setLoading(true);
+        const { data, error } = await supabase
+          .from('user_measurements')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+
+        if (error && error.code !== 'PGRST116') {
+          // PGRST116 means no rows returned, which is fine for new users
+          console.error('Error fetching measurements:', error);
+          return;
+        }
+
+        if (data) {
+          setMeasurements({
+            height: data.height || '',
+            weight: data.weight || '',
+            body_type: data.body_type || '',
+            shoulder: data.shoulder || '',
+            chest: data.chest || '',
+            waist: data.waist || '',
+            hips: data.hips || '',
+            thighs: data.thighs || '',
+            inseam_length: data.inseam_length || '',
+            skin_tone: data.skin_tone || '',
+            gender: data.gender || '',
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching measurements:', error);
+      } finally {
+        setLoading(false);
       }
-    }
-  }, []);
+    };
+
+    fetchMeasurements();
+  }, [user]);
 
   const handleChange = (key: keyof UserMeasurements, value: string) => {
     setMeasurements(prev => ({
@@ -61,14 +97,62 @@ const UserProfileForm = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Save measurements to local storage for persistence
-    localStorage.setItem('userMeasurements', JSON.stringify(measurements));
-    toast({
-      title: "Profile updated",
-      description: "Your measurements have been saved successfully.",
-    });
+    
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to save your measurements.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    try {
+      setLoading(true);
+      
+      // Check if the user already has a record
+      const { data: existingData } = await supabase
+        .from('user_measurements')
+        .select('id')
+        .eq('id', user.id)
+        .single();
+      
+      let result;
+      
+      if (existingData) {
+        // Update existing record
+        result = await supabase
+          .from('user_measurements')
+          .update(measurements)
+          .eq('id', user.id);
+      } else {
+        // Insert new record
+        result = await supabase
+          .from('user_measurements')
+          .insert({
+            id: user.id,
+            ...measurements
+          });
+      }
+      
+      if (result.error) throw result.error;
+      
+      toast({
+        title: "Profile updated",
+        description: "Your measurements have been saved successfully.",
+      });
+    } catch (error: any) {
+      console.error('Error saving measurements:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to save measurements",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const bodyTypes = ["Hourglass", "Rectangle", "Triangle", "Inverted Triangle", "Apple", "Pear", "Athletic"];
@@ -101,8 +185,8 @@ const UserProfileForm = () => {
           <div className="space-y-2">
             <Label htmlFor="bodyType">Body Type</Label>
             <Select 
-              value={measurements.bodyType} 
-              onValueChange={value => handleChange('bodyType', value)}
+              value={measurements.body_type} 
+              onValueChange={value => handleChange('body_type', value)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select body type" />
@@ -118,8 +202,8 @@ const UserProfileForm = () => {
           <div className="space-y-2">
             <Label htmlFor="skinTone">Skin Tone</Label>
             <Select 
-              value={measurements.skinTone} 
-              onValueChange={value => handleChange('skinTone', value)}
+              value={measurements.skin_tone} 
+              onValueChange={value => handleChange('skin_tone', value)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select skin tone" />
@@ -214,14 +298,16 @@ const UserProfileForm = () => {
               <Input
                 id="inseamLength"
                 type="number"
-                value={measurements.inseamLength}
-                onChange={e => handleChange('inseamLength', e.target.value)}
+                value={measurements.inseam_length}
+                onChange={e => handleChange('inseam_length', e.target.value)}
                 placeholder="Inseam length"
               />
             </div>
           </div>
 
-          <Button type="submit" className="w-full">Save Measurements</Button>
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? "Saving..." : "Save Measurements"}
+          </Button>
         </form>
       </CardContent>
     </Card>

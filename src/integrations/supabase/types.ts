@@ -9,7 +9,87 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      user_measurements: {
+        Row: {
+          body_type: string | null
+          chest: string | null
+          created_at: string
+          gender: string | null
+          height: string | null
+          hips: string | null
+          id: string
+          inseam_length: string | null
+          shoulder: string | null
+          skin_tone: string | null
+          thighs: string | null
+          updated_at: string
+          waist: string | null
+          weight: string | null
+        }
+        Insert: {
+          body_type?: string | null
+          chest?: string | null
+          created_at?: string
+          gender?: string | null
+          height?: string | null
+          hips?: string | null
+          id: string
+          inseam_length?: string | null
+          shoulder?: string | null
+          skin_tone?: string | null
+          thighs?: string | null
+          updated_at?: string
+          waist?: string | null
+          weight?: string | null
+        }
+        Update: {
+          body_type?: string | null
+          chest?: string | null
+          created_at?: string
+          gender?: string | null
+          height?: string | null
+          hips?: string | null
+          id?: string
+          inseam_length?: string | null
+          shoulder?: string | null
+          skin_tone?: string | null
+          thighs?: string | null
+          updated_at?: string
+          waist?: string | null
+          weight?: string | null
+        }
+        Relationships: []
+      }
+      user_profiles: {
+        Row: {
+          address: string | null
+          created_at: string
+          email: string | null
+          id: string
+          name: string | null
+          phone_number: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          email?: string | null
+          id: string
+          name?: string | null
+          phone_number?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string | null
+          phone_number?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
