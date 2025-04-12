@@ -16,9 +16,14 @@ import {
 type UserMeasurements = {
   height: string;
   weight: string;
+  bodyType: string;
+  shoulder: string;
   chest: string;
   waist: string;
   hips: string;
+  thighs: string;
+  inseamLength: string;
+  skinTone: string;
   gender: string;
 };
 
@@ -26,9 +31,14 @@ const UserProfileForm = () => {
   const [measurements, setMeasurements] = useState<UserMeasurements>({
     height: '',
     weight: '',
+    bodyType: '',
+    shoulder: '',
     chest: '',
     waist: '',
     hips: '',
+    thighs: '',
+    inseamLength: '',
+    skinTone: '',
     gender: '',
   });
 
@@ -61,6 +71,9 @@ const UserProfileForm = () => {
     });
   };
 
+  const bodyTypes = ["Hourglass", "Rectangle", "Triangle", "Inverted Triangle", "Apple", "Pear", "Athletic"];
+  const skinTones = ["Fair", "Light", "Medium", "Olive", "Tan", "Deep", "Dark"];
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -81,6 +94,40 @@ const UserProfileForm = () => {
                 <SelectItem value="male">Male</SelectItem>
                 <SelectItem value="female">Female</SelectItem>
                 <SelectItem value="other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="bodyType">Body Type</Label>
+            <Select 
+              value={measurements.bodyType} 
+              onValueChange={value => handleChange('bodyType', value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select body type" />
+              </SelectTrigger>
+              <SelectContent>
+                {bodyTypes.map(type => (
+                  <SelectItem key={type} value={type.toLowerCase()}>{type}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="skinTone">Skin Tone</Label>
+            <Select 
+              value={measurements.skinTone} 
+              onValueChange={value => handleChange('skinTone', value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select skin tone" />
+              </SelectTrigger>
+              <SelectContent>
+                {skinTones.map(tone => (
+                  <SelectItem key={tone} value={tone.toLowerCase()}>{tone}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -110,6 +157,16 @@ const UserProfileForm = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
+              <Label htmlFor="shoulder">Shoulder (cm)</Label>
+              <Input
+                id="shoulder"
+                type="number"
+                value={measurements.shoulder}
+                onChange={e => handleChange('shoulder', e.target.value)}
+                placeholder="Shoulder width"
+              />
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="chest">Chest (cm)</Label>
               <Input
                 id="chest"
@@ -129,6 +186,9 @@ const UserProfileForm = () => {
                 placeholder="Waist circumference"
               />
             </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label htmlFor="hips">Hips (cm)</Label>
               <Input
@@ -137,6 +197,26 @@ const UserProfileForm = () => {
                 value={measurements.hips}
                 onChange={e => handleChange('hips', e.target.value)}
                 placeholder="Hip circumference"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="thighs">Thighs (cm)</Label>
+              <Input
+                id="thighs"
+                type="number"
+                value={measurements.thighs}
+                onChange={e => handleChange('thighs', e.target.value)}
+                placeholder="Thigh circumference"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="inseamLength">Inseam Length (cm)</Label>
+              <Input
+                id="inseamLength"
+                type="number"
+                value={measurements.inseamLength}
+                onChange={e => handleChange('inseamLength', e.target.value)}
+                placeholder="Inseam length"
               />
             </div>
           </div>

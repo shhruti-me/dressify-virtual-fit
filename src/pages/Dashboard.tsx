@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import UserProfileForm from '@/components/UserProfileForm';
 import OutfitExplorer from '@/components/OutfitExplorer';
-import { User, Shirt, LogOut } from 'lucide-react';
+import { User, Shirt, LogOut, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
 
@@ -25,10 +25,16 @@ const Dashboard = () => {
       <header className="border-b">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-primary">DressFit</h1>
-          <Button variant="ghost" onClick={handleLogout}>
-            <LogOut className="h-4 w-4 mr-2" />
-            Logout
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => navigate('/user-profile')}>
+              <Settings className="h-4 w-4 mr-2" />
+              My Profile
+            </Button>
+            <Button variant="ghost" onClick={handleLogout}>
+              <LogOut className="h-4 w-4 mr-2" />
+              Logout
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -38,7 +44,7 @@ const Dashboard = () => {
             <TabsList>
               <TabsTrigger value="profile" className="flex items-center gap-2">
                 <User className="h-4 w-4" />
-                My Profile
+                My Measurements
               </TabsTrigger>
               <TabsTrigger value="explore" className="flex items-center gap-2">
                 <Shirt className="h-4 w-4" />
